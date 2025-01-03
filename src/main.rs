@@ -1,5 +1,6 @@
 use std::fs;
 use std::io;
+use std::process::Output;
 const EXTENSION: &str = ".txt";
 
 const HELP: &str = "Usage: todo [COMMAND] [ARGUMENTS]
@@ -45,16 +46,61 @@ fn main() {
     list_files();
     
     println!("The program is running.\nType :quit to quit");
+    let mut all_files = vector_files();
+    let mut file = all_files[0].clone();
     while EXTENSION != "infinite_loop"
     {
         let mut command = String::from("");
-        let _ = io::stdin().read_line(&mut command);
-        if command.contains(":quit")
+        let _= (io::stdin().read_line(&mut command));
+        command = command.to_string().clone();
+        let split_command: Vec<&str> = command.split(" ").map(|x| x).collect::<Vec<&str>>();
+
+        //all commands
+        match split_command[0]
         {
-            break;
+            "add" => {}
+            "remove"=> {}
+            "edit" => {}
+            "complete" => {}
+            "change_list" => {file = all_files[split_command[1].parse::<usize>().unwrap()].clone()}
+            "create_list" => {create_list((split_command[1..]).to_vec());}
+            "delete_list" => {delete_list(split_command[1].parse().unwrap());}
+            "edit_list" => edit_list(split_command[1].parse().unwrap(), &file),
+            "lists"=> list_files(),
+            "quit"=> break,
+            _ => {println!("Invalid Command")}
         }
+        all_files = vector_files();
+
     }
     println!("Hello, world!");
+}
+fn create_list(vector: Vec<&str>)
+{
+    let binding = vector.join(" ");
+    let name = binding.as_str();
+    let _ = fs::File::create_new("C:\\todo".to_owned() + name + EXTENSION);
+}
+fn delete_list(index: usize)
+{
+    let files = vector_files();
+    let output = fs::remove_file("C:\\todo".to_owned()+ &files[index]);
+    match output {
+        Ok(_) => println!("{}, has been successfully deleted", &files[index]),
+        Err(e) => println!("The file has not been deleted \n\n{}", e)
+    }
+}
+
+fn edit_list(index: usize, name: &str)
+{
+    let files = vector_files();
+    let original = &files[index.clone()];
+    let output = fs::rename(original, name.to_owned() + EXTENSION);
+    match  output {
+        Ok(_) => println!("The list has been renamed successfully"),
+        Err(e) => println!("An Error has occured \n\n{}",e)
+    }
+
 }
 
 fn list_files()
@@ -63,4 +109,14 @@ fn list_files()
     {
         println!("{}", file.unwrap().path().display());
     }
+}
+
+fn vector_files() -> Vec<String>
+{
+    let mut vector = vec![];
+    for file in fs::read_dir("C:\\todo").unwrap()
+    {
+        let _ = vector.push(file.unwrap().path().display().to_string());
+    }
+    vector
 }
