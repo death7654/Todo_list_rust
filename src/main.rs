@@ -26,10 +26,16 @@ fn main() {
         Err(e) => println!("Unable to create directory \n\n {}", e),
     }
     list_files();
-
-    println!("The program is running.\nType quit to quit");
     let mut all_files = vector_files();
     let mut file = all_files[0].clone();
+
+    let mut selected = file{
+        name: file.to_string(),
+        tasks: Vec::new()
+    };
+    
+
+    println!("The program is running.\nType quit to quit");
     while EXTENSION != "infinite_loop" {
         let mut command = String::from("");
         let _ = io::stdin().read_line(&mut command);
@@ -112,4 +118,10 @@ fn vector_files() -> Vec<String> {
         let _ = vector.push(file.unwrap().path().display().to_string());
     }
     vector
+}
+
+
+fn json_to_struct(file: String)
+{
+
 }
