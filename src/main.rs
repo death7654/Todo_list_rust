@@ -61,7 +61,7 @@ fn main() {
             _ if request.contains("delete_list") => {
                 delete_list(split_command[1].parse().unwrap());
             }
-            _ if request.contains("edit_list") => edit_list(split_command[1].parse().unwrap(), &split_command[2..]),
+            _ if request.contains("edit_list") => {edit_list(split_command[1].parse().unwrap(), &split_command[2..])},
             _ if request.contains("lists") => list_files(),
             _ if request.contains("quit") => break,
             _ => {
