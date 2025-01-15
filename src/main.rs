@@ -93,7 +93,7 @@ fn main() {
                 todo_orig.map.remove(&split_command[1].to_string());
                 todo_orig.clone().save(&file);
             }
-            _ if request.contains("edit_task") => {
+            _ if request.contains("rename_task") => {
                 todo_orig.map.remove(&split_command[1].to_string());
                 todo_orig.add(split_command[2].to_string());
                 todo_orig.clone().save(&file);
@@ -104,7 +104,7 @@ fn main() {
             _ if request.contains("uncomplete_task") => {
                 todo_orig.map.insert(split_command[1].to_string(), false);
             }
-            _ if request.contains("list_task") => {
+            _ if request.contains("list_tasks") => {
                 let list = &todo.map;
                 let mut num = 1;
                 for (key, _) in list {
@@ -130,11 +130,14 @@ fn main() {
             }
             _ if request.contains("delete_list") => {
                 delete_list(split_command[1].parse().unwrap());
+                file = all_files[0].clone();
             }
             _ if request.contains("rename_list") => {
                 edit_list(split_command[1].parse().unwrap(), &split_command[2])
             }
+            _ if request.contains("current_list") => println!("{file}"),
             _ if request.contains("lists") => list_files(),
+            _ if request.contains("help") => help(),
             _ if request.contains("quit") => {
                 todo_orig.save(&file);
                 break;
@@ -148,7 +151,9 @@ fn main() {
 }
 
 fn change_list(file: &String) -> bool {
-    let check = File::open("C:\\todo\\".to_owned() + &file + EXTENSION);
+    let path = PathBuf::from("C:\\todo\\").join(file);
+    println!("{:#?}", path);
+    let check = File::open(path);
     match check {
         Ok(_) => return true,
         Err(e) => {
@@ -177,7 +182,6 @@ fn delete_list(index: usize) {
     }
 }
 
-//todo find out why rename does not rename the file
 fn edit_list(index: usize, name: &str) {
     let files = vector_files();
     let original = PathBuf::from("C:\\todo").join(&files[index - 1]);
@@ -198,6 +202,10 @@ fn list_files() {
         println!("{num}. {}", file.unwrap().path().display());
         num += 1;
     }
+}
+fn help()
+{
+    println!("Help Page\nadd_task [name]\n    - adds task\nremove_task [name]\n    - removes task\nrename_task [name]\n    - renames task\ncomplete_task [name]\n    - marks a task as complete\nuncomplete_task [name]\n    - makes a task a incomplete\nlist_tasks\n    - lists all tasks in the current list\nchange_list\n    - changes list\ncreate_list\n    - creates a list\ndelete_list\n    - deletes a list\nrename_list\n    - renames a list\ncurrent_list\n    - displays current list\nlists\n    - displays all lists\nhelp\n    - displays this page\nquit\n    - saves and quits this program");
 }
 
 fn vector_files() -> Vec<String> {
