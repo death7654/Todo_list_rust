@@ -4,6 +4,7 @@ use std::fs;
 use std::fs::File;
 use std::io;
 use std::io::Read;
+use std::path::PathBuf;
 use std::str::FromStr;
 use std::usize;
 const EXTENSION: &str = ".txt";
@@ -49,8 +50,14 @@ fn main() {
         Err(e) => println!("Unable to create directory \n\n {}", e),
     }
     //lists files
-    list_files();
     let mut all_files = vector_files();
+    if vector_files().len() == 0
+    {
+        let path = PathBuf::from("C:\\todo\\default.txt");
+        let _ = fs::File::create(path);
+        all_files = vector_files();
+    }
+    list_files();
 
     //selecting file
     println!("\nChoose a file");
@@ -64,7 +71,7 @@ fn main() {
 
     let mut todo_orig: Todo = Todo::new(&file).expect("failure");
 
-    println!("The program is running.\nType quit to quit");
+    println!("\nThe program is running.\nType quit to quit\n");
     while EXTENSION != "infinite_loop" {
         let todo: Todo = todo_orig.clone();
 
@@ -106,7 +113,7 @@ fn main() {
                     if convert == true {
                         printcoln!("[:strikethrough]{}. {}", num, key);
                     } else {
-                        println!("{num}. {key}");
+                        printcoln!("[:]{}. {}", num, key);
                     }
                     num += 1;
                 }
@@ -124,8 +131,8 @@ fn main() {
             _ if request.contains("delete_list") => {
                 delete_list(split_command[1].parse().unwrap());
             }
-            _ if request.contains("edit_list_name") => {
-                edit_list(split_command[1].parse().unwrap(), &split_command[2..])
+            _ if request.contains("rename_list") => {
+                edit_list(split_command[1].parse().unwrap(), &split_command[2])
             }
             _ if request.contains("lists") => list_files(),
             _ if request.contains("quit") => {
@@ -133,12 +140,11 @@ fn main() {
                 break;
             }
             _ => {
-                println!("Invalid Command")
+                println!("\nInvalid Command")
             }
         }
         all_files = vector_files();
     }
-    println!("Hello, world!");
 }
 
 fn change_list(file: &String) -> bool {
@@ -151,12 +157,11 @@ fn change_list(file: &String) -> bool {
         }
     };
 }
-//file not being creating in directory
 fn create_list(vector: Vec<&str>) {
-    println!("called");
     let binding = vector.join(" ");
     let name = binding.as_str().to_owned() + EXTENSION;
-    let output = fs::File::create_new("C:\\todo".to_owned() + &name);
+    let file = PathBuf::from("C:\\todo").join(name);
+    let output = fs::File::create(file);
     match output {
         Ok(_) => println!("the file has been successfully created"),
         Err(e) => println!("The file has not been created \n\n{e}"),
@@ -173,13 +178,14 @@ fn delete_list(index: usize) {
 }
 
 //todo find out why rename does not rename the file
-fn edit_list(index: usize, name: &[&str]) {
+fn edit_list(index: usize, name: &str) {
     let files = vector_files();
-    let original = &files[index - 1];
-    let new_name = name.join(" ") + EXTENSION;
-    println!("{original}");
-    println!("{new_name}");
-    let output = fs::rename(original, new_name);
+    let original = PathBuf::from("C:\\todo").join(&files[index - 1]);
+    let mut new_name = "C:\\todo\\".to_owned();
+    new_name.push_str(name);
+    new_name.push_str(EXTENSION);
+    let path = PathBuf::from(new_name);
+    let output = fs::rename(original, path);
     match output {
         Ok(_) => println!("The list has been renamed successfully"),
         Err(e) => println!("An Error has occured \n\n{e}"),
