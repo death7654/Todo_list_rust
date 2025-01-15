@@ -51,8 +51,7 @@ fn main() {
     }
     //lists files
     let mut all_files = vector_files();
-    if vector_files().len() == 0
-    {
+    if vector_files().len() == 0 {
         let path = PathBuf::from("C:\\todo\\default.txt");
         let _ = fs::File::create(path);
         all_files = vector_files();
@@ -65,9 +64,8 @@ fn main() {
     let _ = io::stdin().read_line(&mut command);
     command = command.to_string().clone();
     let split: Vec<&str> = command.split(" ").map(|x| x.trim()).collect::<Vec<&str>>();
-    let file_index = split[0].parse::<usize>().unwrap() -1;
+    let file_index = split[0].parse::<usize>().unwrap() - 1;
     let mut file = all_files[file_index].clone();
-
 
     let mut todo_orig: Todo = Todo::new(&file).expect("failure");
 
@@ -203,8 +201,7 @@ fn list_files() {
         num += 1;
     }
 }
-fn help()
-{
+fn help() {
     println!("Help Page\nadd_task [name]\n    - adds task\nremove_task [name]\n    - removes task\nrename_task [name]\n    - renames task\ncomplete_task [name]\n    - marks a task as complete\nuncomplete_task [name]\n    - makes a task a incomplete\nlist_tasks\n    - lists all tasks in the current list\nchange_list\n    - changes list\ncreate_list\n    - creates a list\ndelete_list\n    - deletes a list\nrename_list\n    - renames a list\ncurrent_list\n    - displays current list\nlists\n    - displays all lists\nhelp\n    - displays this page\nquit\n    - saves and quits this program");
 }
 
